@@ -1,104 +1,161 @@
 'use client';
-import {useMemo,useState} from 'react';
-import {ArrowRight, ChevronLeft, CloudSun, MapPin, Sparkles, Brain, Star, Check, Menu, X, Droplets, FlaskConical, RefreshCw} from 'lucide-react';
 
-const trends=[
- {id:'glass',name:'Glass Hair',delta:'+38%',tag:'High-shine • Rising',desc:'A smooth, reflective finish is gaining momentum.',match:'95%',tone:'peach'},
- {id:'scalp',name:'Scalp Reset',delta:'+21%',tag:'Clean • Rising',desc:'More consumers are starting with scalp-first routines.',match:'82%',tone:'sage'},
- {id:'heatless',name:'Heatless Styling',delta:'+17%',tag:'Low-heat • Rising',desc:'Texture and movement without repeated heat exposure.',match:'76%',tone:'lavender'}
-];
-const reviews=[
- {name:'Aarohi',segment:'Dry / Damaged',rating:5,text:'The recommendation felt surprisingly specific to my hair. I liked seeing why each part of the formula was chosen.'},
- {name:'Meera',segment:'Oily / Fine',rating:5,text:'I usually get generic recommendations. This one actually considered how quickly my scalp gets oily.'},
- {name:'Riya',segment:'Normal / Balanced',rating:4,text:'The weather adjustment is the part that made the most sense to me. My routine feels lighter on humid days.'},
- {name:'Ananya',segment:'Dry / Damaged',rating:5,text:'I could see exactly what Nexxus had learned from my feedback. It made the experience feel safer and more transparent.'}
+import { useMemo, useState } from 'react';
+import { ArrowRight, Check, ChevronLeft, FlaskConical, Menu, Sparkles, Star, X } from 'lucide-react';
+
+const trendData = [
+  {
+    id: 'glass', title: 'Glass Hair', delta: '+38%', tag: 'High-shine • Trending', match: '94%',
+    description: 'The ultra-reflective, smooth finish is having a moment.',
+    image: 'https://images.unsplash.com/photo-1519699047748-de8e457a634e?auto=format&fit=crop&w=1200&q=85'
+  },
+  {
+    id: 'scalp', title: 'Scalp Reset', delta: '+21%', tag: 'Clean • Rising', match: '81%',
+    description: 'A calmer, cleaner scalp-first routine is moving mainstream.',
+    image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=85'
+  },
+  {
+    id: 'volume', title: 'Soft Volume', delta: '+17%', tag: 'Airy • Rising', match: '76%',
+    description: 'Lightweight volume without the dry, overloaded feel.',
+    image: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=1200&q=85'
+  }
 ];
 
-const ingredientInfo=[
- ['Sodium Lauroyl Sarcosinate','Cleansing','Gentle surfactant used for cleansing.'],
- ['Cocamidopropyl Betaine','Cleansing support','Milder cleansing support within the formula.'],
- ['Panthenol','Moisture','Humectant/conditioning support.'],
- ['Argan Oil','Conditioning','Emollient support for softness and conditioning.'],
- ['Polyquaternium-10','Manageability','Conditioning polymer used to support detangling and manageability.']
+const reviews = [
+  { name: 'Aarohi', segment: 'Dry / Damaged', rating: 5, text: 'The recommendation felt surprisingly specific to my hair. I liked seeing why each part of the formula was chosen.' },
+  { name: 'Kabir', segment: 'Oily / Fine', rating: 5, text: 'I usually get generic recommendations. This one actually considered how quickly my scalp gets oily.' },
+  { name: 'Riya', segment: 'Normal / Balanced', rating: 4, text: 'The weather adjustment made the most sense to me. My routine feels lighter on humid days.' },
+  { name: 'Arjun', segment: 'Curly / Dry', rating: 5, text: 'Seeing the reasoning behind the recommendation made the whole experience feel much more transparent.' }
 ];
 
-function App(){
- const [screen,setScreen]=useState('home');
- const [mobileOpen,setMobileOpen]=useState(false);
- const [quiz,setQuiz]=useState({age:'',gender:'',texture:'',density:'',scalp:'',concern:'',heat:'',goal:'',city:'Mumbai',context:'',trend:'glass'});
- const [rating,setRating]=useState(5); const [repeat,setRepeat]=useState(null); const [reviewText,setReviewText]=useState('');
- const [activeTrend,setActiveTrend]=useState(trends[0]);
- const go=(s)=>{setScreen(s);setMobileOpen(false);window.scrollTo({top:0,behavior:'smooth'})};
- const setQ=(k,v)=>setQuiz(q=>({...q,[k]:v}));
- const segment=useMemo(()=>{
-   if(quiz.scap==='oily'||quiz.density==='fine') return 'H1 · Oily / Fine';
-   if(quiz.concern==='damage'||quiz.texture==='curly'||quiz.heat==='often') return 'H3 · Dry / Damaged';
-   return 'H2 · Normal / Balanced';
- },[quiz]);
- const formula=useMemo(()=>{
-   const dry=segment.startsWith('H3'); const oily=segment.startsWith('H1');
-   const humidity=quiz.city==='Mumbai';
-   return {base: dry?'69':'72',hydrate: dry?'15':'12',repair:dry?'10':oily?'7':'9',finish:dry?'6':oily?'9':humidity?'7':'9'};
- },[segment,quiz]);
- return <main className="shell">
-  <header>
-   <button className="brand" onClick={()=>go('home')}><span>NEXXUS</span><small>INTELLIGENCE</small></button>
-   <nav className={mobileOpen?'open':''}><button onClick={()=>go('home')}>Home</button><button onClick={()=>go('trends')}>Explore trends</button><button onClick={()=>go('how')}>How it works</button><button onClick={()=>go('reviews')}>Reviews</button></nav>
-   <div className="header-actions"><button className="quiz-mini" onClick={()=>go('quiz')}>Take the quiz <ArrowRight size={14}/></button><button className="menu" onClick={()=>setMobileOpen(v=>!v)}>{mobileOpen?<X/>:<Menu/>}</button></div>
-  </header>
-  {screen==='home'&&<Home go={go} setActiveTrend={setActiveTrend}/>} 
-  {screen==='quiz'&&<Quiz quiz={quiz} setQ={setQ} segment={segment} go={go}/>} 
-  {screen==='profile'&&<Profile quiz={quiz} segment={segment} go={go}/>} 
-  {screen==='recommendation'&&<Recommendation quiz={quiz} segment={segment} formula={formula} go={go}/>} 
-  {screen==='formula'&&<Formula quiz={quiz} segment={segment} formula={formula} go={go}/>} 
-  {screen==='reviews'&&<Reviews rating={rating} setRating={setRating} repeat={repeat} setRepeat={setRepeat} reviewText={reviewText} setReviewText={setReviewText} go={go}/>} 
-  {screen==='trends'&&<Trends active={activeTrend} setActive={setActiveTrend} go={go}/>} 
-  {screen==='how'&&<How go={go}/>} 
-  {screen==='learn'&&<Learn go={go}/>} 
-  <footer><span>SCIENCE THAT LEARNS YOUR HAIR.</span><span>Prototype experience • Product concepts are illustrative</span></footer>
- </main>
+const ingredients = [
+  ['Panthenol', 'Hydrate', 'Humectant and conditioning support.'],
+  ['Argan Oil', 'Condition', 'Emollient support for softness and conditioning.'],
+  ['Polyquaternium-10', 'Manageability', 'Conditioning polymer supporting detangling and feel.'],
+  ['Cocamidopropyl Betaine', 'Cleanse', 'Milder cleansing support in a formula system.'],
+  ['Sodium Lauroyl Sarcosinate', 'Cleanse', 'Gentle surfactant used for cleansing.']
+];
+
+const quizSteps = [
+  ['age', 'Let’s start with you.', 'A little context helps Nexxus personalize the experience.', ['18–24', '25–34', '35–44', '45–54', '55+']],
+  ['gender', 'How do you identify?', 'Context matters. It never decides your formula on its own.', ['Woman', 'Man', 'Non-binary', 'Prefer not to say']],
+  ['texture', 'How would you describe your hair?', 'Choose what feels most natural to you.', ['Straight', 'Wavy', 'Curly', 'Coily']],
+  ['density', 'What is your hair density?', 'Think about how much hair you have, not strand diameter.', ['Fine', 'Medium', 'Thick']],
+  ['scalp', 'How does your scalp usually behave?', 'This helps balance cleansing and conditioning.', ['Oily', 'Balanced', 'Dry', 'Changes often']],
+  ['concern', 'What needs the most attention right now?', 'Pick the outcome that matters most today.', ['Frizz', 'Dryness', 'Damage', 'Scalp', 'Dullness', 'Hair fall']],
+  ['heat', 'How often do you use heat styling?', 'Your routine changes what your hair may need.', ['Never', 'Sometimes', 'Often']],
+  ['goal', 'What does great hair look like to you?', 'Choose the result you care about most.', ['Glass-like shine', 'Deep hydration', 'Repair & strength', 'Frizz control', 'Healthy scalp', 'Volume & movement']],
+  ['city', 'Where does your hair live?', 'Environment is one of Nexxus’ formulation signals.', ['Mumbai', 'Delhi', 'Bengaluru', 'Kolkata', 'Chennai', 'Other city']],
+  ['context', 'Anything affecting your hair lately?', 'Use context as a signal, never as a diagnosis.', ['Stress', 'Sleep changes', 'Weather change', 'Lifestyle change', 'Nothing noticeable', 'Not sure']],
+  ['trend', 'A trend is taking off.', 'Would you try Glass Hair?', ['Absolutely', 'Maybe', 'Not for me']]
+];
+
+export default function App() {
+  const [page, setPage] = useState('home');
+  const [menu, setMenu] = useState(false);
+  const [quiz, setQuiz] = useState({ age: '', gender: '', texture: '', density: '', scalp: '', concern: '', heat: '', goal: '', city: 'Mumbai', context: '', trend: '' });
+  const [trend, setTrend] = useState(trendData[0]);
+  const [rating, setRating] = useState(5);
+  const [reviewText, setReviewText] = useState('');
+
+  const go = (next) => { setPage(next); setMenu(false); if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const setQ = (key, value) => setQuiz((q) => ({ ...q, [key]: value }));
+
+  const segment = useMemo(() => {
+    if (quiz.scap === 'Oily' || quiz.density === 'Fine') return 'H1 · Oily / Fine';
+    if (quiz.concern === 'Damage' || quiz.texture === 'Curly' || quiz.heat === 'Often' || quiz.scalp === 'Dry') return 'H3 · Dry / Damaged';
+    return 'H2 · Normal / Balanced';
+  }, [quiz]);
+
+  const formula = useMemo(() => {
+    const dry = segment.startsWith('H3');
+    const oily = segment.startsWith('H1');
+    return dry ? { base: 69, hydrate: 15, repair: 10, finish: 6 } : oily ? { base: 72, hydrate: 12, repair: 7, finish: 9 } : { base: 72, hydrate: 12, repair: 9, finish: 7 };
+  }, [segment]);
+
+  return (
+    <main className="shell">
+      <header className="nav">
+        <button className="brand" onClick={() => go('home')}><span>NEXXUS</span><small>INTELLIGENCE</small></button>
+        <nav className={menu ? 'open' : ''}>
+          <button onClick={() => go('home')}>My hair</button>
+          <button onClick={() => go('trends')}>Discover</button>
+          <button onClick={() => go('how')}>How it works</button>
+          <button onClick={() => go('reviews')}>Reviews</button>
+        </nav>
+        <div className="nav-actions">
+          <button className="quiz-mini" onClick={() => go('quiz')}>Take the quiz <ArrowRight size={14} /></button>
+          <button className="menu-btn" onClick={() => setMenu((v) => !v)}>{menu ? <X /> : <Menu />}</button>
+          <span className="avatar">S</span>
+        </div>
+      </header>
+
+      {page === 'home' && <Home go={go} setTrend={(t) => { setTrend(t); go('trends'); }} />}
+      {page === 'quiz' && <Quiz quiz={quiz} setQ={setQ} go={go} />}
+      {page === 'profile' && <Profile quiz={quiz} segment={segment} go={go} />}
+      {page === 'recommendation' && <Recommendation quiz={quiz} segment={segment} go={go} />}
+      {page === 'formula' && <Formula quiz={quiz} formula={formula} go={go} />}
+      {page === 'trends' && <Trends active={trend} setActive={setTrend} go={go} />}
+      {page === 'how' && <How go={go} />}
+      {page === 'reviews' && <Reviews rating={rating} setRating={setRating} reviewText={reviewText} setReviewText={setReviewText} go={go} />}
+
+      <footer><b>NEXXUS</b><span>Science that learns your hair.</span><span>Prototype experience • Product concepts are illustrative</span></footer>
+    </main>
+  );
 }
 
-function Home({go,setActiveTrend}){return <section>
- <div className="hero">
-  <div className="hero-copy"><div className="eyebrow"><Sparkles size={14}/> PERSONALIZED HAIR INTELLIGENCE</div><h1>Your hair isn't generic.<br/><i>Your haircare shouldn't be either.</i></h1><p>Nexxus learns your hair, your routine and your environment — then turns those signals into a recommendation that evolves with you.</p><button className="primary large" onClick={()=>go('quiz')}>Take the 60-sec quiz <ArrowRight size={17}/></button><div className="micro"><span>01 · Understand you</span><span>02 · Personalize</span><span>03 · Learn</span></div></div>
-  <div className="hero-device"><div className="device-glow"/><div className="device-card"><div className="device-top"><span>NEXXUS ADAPT</span><small>INTELLIGENCE DEVICE</small></div><div className="device-slots"><div className="slot base"><b>BASE</b></div><div className="slot hydrate"><b>HYDRATE</b></div><div className="slot repair"><b>REPAIR</b></div><div className="slot finish"><b>FINISH</b></div></div><div className="device-screen"><span>TODAY'S FORMULA</span><strong>72 / 12 / 9 / 7</strong><small>Profile + weather + history</small></div><div className="device-foot"><Droplets size={15}/> FRESHLY MIXED FOR YOU</div></div></div>
- </div>
- <div className="trust-strip"><div><span>Hair science</span><b>Explainable</b></div><div><span>Environment</span><b>Context-aware</b></div><div><span>Feedback</span><b>Always learning</b></div><div><span>Formulation</span><b>Pre-validated</b></div></div>
- <div className="section-head"><div><div className="eyebrow">WHAT'S HAPPENING IN HAIRCARE</div><h2>Trending, reinterpreted.</h2><p>Popularity is a signal. Nexxus decides whether it matters for you.</p></div><button className="ghost" onClick={()=>go('trends')}>Explore all trends <ArrowRight size={16}/></button></div>
- <div className="trend-grid">{trends.map(t=><button className={`trend-card ${t.tone}`} key={t.id} onClick={()=>{setActiveTrend(t);go('trends')}}><div className="trend-art"><span>{t.name}</span><b>{t.delta}</b><small>{t.tag}</small></div><div className="trend-content"><h3>{t.name}</h3><p>{t.desc}</p><div className="match">Your prototype match <b>{t.match}</b><ArrowRight size={14}/></div></div></button>)}</div>
- <div className="how-teaser"><div><div className="eyebrow">THE NEXXUS LOOP</div><h2>From signal to formula.</h2></div><div className="loop-mini"><span>YOU</span><ArrowRight/><span>INTELLIGENCE</span><ArrowRight/><span>FORMULA</span><ArrowRight/><span>FEEDBACK</span><ArrowRight/><span>LEARN</span></div><button className="ghost" onClick={()=>go('how')}>See how it works <ArrowRight size={15}/></button></div>
- <div className="reviews-teaser"><div><div className="eyebrow">TRUST, BUILT IN</div><h2>People like you are part of the loop.</h2><p>See what similar hair profiles are saying — then leave your own signal.</p></div><div className="review-score"><strong>4.8</strong><div>★★★★★</div><span>Prototype review set</span></div><button className="primary" onClick={()=>go('reviews')}>Read reviews <ArrowRight size={16}/></button></div>
- </section>}
+function Home({ go, setTrend }) {
+  return <section className="home">
+    <div className="hero">
+      <div className="hero-copy">
+        <div className="eyebrow"><Sparkles size={14} /> YOUR HAIR, RIGHT NOW</div>
+        <h1>Science that<br /><i>learns</i> your hair.</h1>
+        <p>Nexxus combines hair science with what we learn from your routine, preferences and environment — so your next recommendation gets better.</p>
+        <div className="chips"><span>⌖ Mumbai</span><span>☁ 31°C · 78% humidity</span><span>Dry · Frizz-prone · Shine seeker</span></div>
+        <div className="hero-buttons"><button className="primary large" onClick={() => go('quiz')}>Take the 60-sec quiz <ArrowRight size={17} /></button><button className="text-btn" onClick={() => go('how')}>How it works <ArrowRight size={15} /></button></div>
+        <div className="micro"><span>01 Discover</span><span>02 Personalize</span><span>03 Analyze</span><span>04 Recommend</span><span>05 Learn</span></div>
+      </div>
+      <div className="hero-image man"><div className="intelligence-card"><span>✣ Hair intelligence</span><b>94%</b><small>Profile confidence · updated today</small></div></div>
+    </div>
 
-function Quiz({quiz,setQ,segment,go}){const [step,setStep]=useState(0);const steps=[
- {key:'age',title:'Let’s start with you.',sub:'A little context helps Nexxus personalize your experience.',options:['18–24','25–34','35–44','45–54','55+']},
- {key:'gender',title:'How do you identify?',sub:'This helps us understand your context. It never decides your formula on its own.',options:['Woman','Man','Non-binary','Prefer not to say']},
- {key:'texture',title:'How would you describe your hair?',sub:'Choose what feels most natural to you.',options:['Straight','Wavy','Curly','Coily']},
- {key:'density',title:'What is your hair density?',sub:'Think about how much hair you have, not how thick each strand feels.',options:['Fine','Medium','Thick']},
- {key:'scalp',title:'How does your scalp usually behave?',sub:'Your answer helps Nexxus balance cleansing and conditioning.',options:['Oily','Balanced','Dry','Changes often']},
- {key:'concern',title:'What needs the most attention right now?',sub:'Pick the one that matters most today.',options:['Frizz','Dryness','Damage','Scalp','Dullness','Hair fall']},
- {key:'heat',title:'How often do you use heat styling?',sub:'Your routine changes what your hair may need.',options:['Never','Sometimes','Often']},
- {key:'goal',title:'What does great hair look like to you?',sub:'Choose the outcome you care about most.',options:['Glass-like shine','Deep hydration','Repair & strength','Frizz control','Healthy scalp','Volume & movement']},
- {key:'city',title:'Where does your hair live?',sub:'Nexxus uses environment as a formulation signal.',options:['Mumbai','Delhi','Bengaluru','Kolkata','Chennai','Other city']},
- {key:'context',title:'Anything affecting your hair lately?',sub:'Context helps us separate routine and environmental signals from personal factors.',options:['Stress','Sleep changes','Weather change','Lifestyle change','Nothing noticeable','Not sure']},
- {key:'trend',title:'A trend is taking off.',sub:'Would you try Glass Hair?',options:['Absolutely','Maybe','Not for me']}
-];
- const current=steps[step];const next=()=>{if(step<steps.length-1)setStep(step+1);else go('profile')};
- return <section className="quiz-page"><div className="quiz-top"><button className="back" onClick={()=>step?setStep(step-1):go('home')}><ChevronLeft size={17}/> {step?'Back':'Exit'}</button><span>{String(step+1).padStart(2,'0')} / {steps.length}</span></div><div className="quiz-progress"><i style={{width:`${((step+1)/steps.length)*100}%`}}/></div><div className="quiz-card"><div className="eyebrow">NEXXUS CONSULTATION</div><h1>{current.title}</h1><p>{current.sub}</p><div className="options">{current.options.map(o=><button key={o} className={quiz[current.key]===o?'selected':''} onClick={()=>setQ(current.key,o)}>{o}{quiz[current.key]===o&&<Check size={16}/>}</button>)}</div><button className="primary" disabled={!quiz[current.key]} onClick={next}>{step===steps.length-1?'Build my Hair Intelligence':'Continue'} <ArrowRight size={17}/></button></div></section>}
+    <div className="section-head"><div><div className="eyebrow">DISCOVERED FOR YOU</div><h2>Trending, reinterpreted.</h2><p>Popularity is a signal. Nexxus decides whether it matters for you.</p></div><button className="text-btn" onClick={() => go('trends')}>What we’ve learned <ArrowRight size={16} /></button></div>
+    <div className="trend-grid">{trendData.map((t) => <button key={t.id} className="trend-card" onClick={() => setTrend(t)}><div className="trend-photo" style={{ backgroundImage: `linear-gradient(0deg, rgba(0,0,0,.66), transparent 58%), url(${t.image})` }}><div><b>{t.delta}</b><span>{t.tag}</span><h3>{t.title}</h3><p>{t.description}</p></div><div className="trend-match"><span>Your match</span><strong>{t.match}</strong><ArrowRight size={15} /></div></div></button>)}</div>
 
-function Profile({quiz,segment,go}){return <section className="profile-page"><div className="eyebrow"><Sparkles size={14}/> HAIR INTELLIGENCE</div><h1>We see a starting point.<br/><i>Now let’s make it smarter.</i></h1><div className="profile-layout"><div className="profile-score"><span>PROFILE CONFIDENCE</span><strong>94%</strong><div className="ring"><div>94</div></div><p>Your profile will evolve as Nexxus learns from your outcomes.</p></div><div className="profile-facts"><div className="fact"><span>SEGMENT</span><b>{segment}</b><small>Based on your scalp, density and hair behaviour.</small></div><div className="fact"><span>YOUR GOAL</span><b>{quiz.goal}</b><small>Nexxus will prioritize this outcome.</small></div><div className="fact"><span>YOUR ENVIRONMENT</span><b>{quiz.city} · 31°C · 78% humidity</b><small>Illustrative live-context layer for the prototype.</small></div><div className="fact"><span>CONTEXT SIGNAL</span><b>{quiz.context}</b><small>Used as context, not as a diagnosis.</small></div></div></div><div className="profile-actions"><button className="ghost" onClick={()=>go('quiz')}><RefreshCw size={15}/> Retake consultation</button><button className="primary" onClick={()=>go('recommendation')}>See my recommendation <ArrowRight size={17}/></button></div></section>}
+    <div className="science-banner"><div><div className="eyebrow">SCIENCE THAT LEARNS YOUR HAIR</div><h2>Personalization without the black box.</h2><p>Every recommendation has a reason — from hair profile and ingredients to weather, trends and feedback.</p></div><button className="primary" onClick={() => go('how')}>See the intelligence loop <ArrowRight size={16} /></button></div>
 
-function Recommendation({quiz,segment,formula,go}){return <section className="recommend-page"><button className="back" onClick={()=>go('profile')}><ChevronLeft size={17}/> Your profile</button><div className="recommend-head"><div><div className="eyebrow">PERSONALIZED RECOMMENDATION</div><h1>Built around<br/><i>your hair.</i></h1><p className="lead">Nexxus combines your segment, goal and environment to create a recommendation — then explains the thinking behind it.</p></div><div className="match-card"><span>PROFILE MATCH</span><strong>95%</strong><small>{quiz.goal} · {quiz.city}</small></div></div><div className="recommend-grid"><div className="product-card"><div className="product-visual"><span>NEXXUS</span><b>ADAPT</b><small>PERSONALIZED HAIRCARE</small></div><div className="product-body"><span>YOUR STARTING FORMULA</span><h2>Humidity-aware {quiz.goal}</h2><p>Designed around the needs of your current profile. Your exact proportions can change with conditions and learning.</p><button className="primary" onClick={()=>go('formula')}>See my formula <ArrowRight size={16}/></button></div></div><div className="why-card"><div className="eyebrow">WHY THIS?</div><div className="why-row"><b>01</b><span><strong>{segment}</strong><small>Your profile points to a specific balance of cleansing, conditioning and finish.</small></span></div><div className="why-row"><b>02</b><span><strong>Humidity-aware</strong><small>Today's conditions can change how a formulation performs.</small></span></div><div className="why-row"><b>03</b><span><strong>Goal-led</strong><small>We optimize for {quiz.goal?.toLowerCase() || 'your goal'}, not for a generic hair type.</small></span></div><div className="science"><FlaskConical size={17}/><div><b>Science inside</b><p>Panthenol, argan oil and conditioning polymers support moisture, softness and manageability within the illustrative formulation system.</p></div></div></div></div><div className="ingredients"><div><div className="eyebrow">INGREDIENT REFERENCE</div><h2>Explainable by design.</h2></div><div className="ingredient-list">{ingredientInfo.map(([n,r,d])=><div key={n}><span>{r}</span><b>{n}</b><small>{d}</small></div>)}</div></div></section>}
+    <div className="reviews-teaser"><div><div className="eyebrow">TRUST, BUILT IN</div><h2>People like you are part of the loop.</h2><p>See what similar hair profiles are saying, then leave your own signal.</p></div><div className="review-score"><strong>4.8</strong><div>★★★★★</div><small>Prototype review set</small></div><button className="primary" onClick={() => go('reviews')}>Read reviews <ArrowRight size={16} /></button></div>
+  </section>;
+}
 
-function Formula({quiz,segment,formula,go}){return <section className="formula-page"><button className="back" onClick={()=>go('recommendation')}><ChevronLeft size={17}/> Recommendation</button><div className="formula-hero"><div><div className="eyebrow">NEXXUS ADAPT</div><h1>Your formula,<br/><i>today.</i></h1><p className="lead">You choose the goal. Nexxus decides the proportions using your profile, environment and previous outcomes.</p><div className="mix-table">{[['BASE',formula.base,'base'],['HYDRATE',formula.hydrate,'hydrate'],['REPAIR',formula.repair,'repair'],['FINISH',formula.finish,'finish']].map(([n,v,c])=><div key={n}><span className={`dot ${c}`}/><b>{n}</b><strong>{v}%</strong><i><em style={{width:`${v}%`}}/></i></div>)}</div><div className="formula-note"><Check size={15}/><span>Within a pre-validated formulation envelope.</span></div></div><div className="machine"><div className="machine-label">NEXXUS ADAPT<br/><small>INTELLIGENCE DEVICE</small></div><div className="cartridges"><div className="car base"><span>BASE</span></div><div className="car hydrate"><span>HYDRATE</span></div><div className="car repair"><span>REPAIR</span></div><div className="car finish"><span>FINISH</span></div></div><div className="mixing"><div className="mix-liquid"/><span>DISPENSING</span></div><div className="machine-status">FRESHLY MIXED FOR <b>{quiz.goal || 'YOUR GOAL'}</b></div></div></div><div className="science-strip"><div><span>SEGMENT</span><b>{segment}</b></div><div><span>ENVIRONMENT</span><b>{quiz.city} · humid</b></div><div><span>LEARNING INPUT</span><b>Outcome history</b></div></div><button className="primary" onClick={()=>go('reviews')}>Use it & rate your experience <ArrowRight size={17}/></button></section>}
+function Quiz({ quiz, setQ, go }) {
+  const [step, setStep] = useState(0);
+  const current = quizSteps[step];
+  const next = () => step < quizSteps.length - 1 ? setStep(step + 1) : go('profile');
+  return <section className="quiz-page"><div className="quiz-top"><button className="back" onClick={() => step ? setStep(step - 1) : go('home')}><ChevronLeft size={17} /> {step ? 'Back' : 'Exit'}</button><span>{String(step + 1).padStart(2, '0')} / {quizSteps.length}</span></div><div className="progress"><i style={{ width: `${((step + 1) / quizSteps.length) * 100}%` }} /></div><div className="quiz-card"><div className="eyebrow">NEXXUS CONSULTATION</div><h1>{current[1]}</h1><p>{current[2]}</p><div className="options">{current[3].map((o) => <button key={o} className={quiz[current[0]] === o ? 'selected' : ''} onClick={() => setQ(current[0], o)}>{o}{quiz[current[0]] === o && <Check size={16} />}</button>)}</div><button className="primary" disabled={!quiz[current[0]]} onClick={next}>{step === quizSteps.length - 1 ? 'Build my Hair Intelligence' : 'Continue'} <ArrowRight size={17} /></button></div></section>;
+}
 
-function Reviews({rating,setRating,repeat,setRepeat,reviewText,setReviewText,go}){return <section className="reviews-page"><div className="reviews-head"><div><div className="eyebrow">NEXXUS COMMUNITY</div><h1>Trust is part<br/><i>of the formula.</i></h1><p className="lead">Explore illustrative prototype reviews, then add your own signal.</p></div><div className="big-rating"><strong>4.8</strong><span>★★★★★</span><small>Prototype review set</small></div></div><div className="review-layout"><div className="review-list"><div className="review-filters"><button className="active">All</button><button>Oily / Fine</button><button>Balanced</button><button>Dry / Damaged</button></div>{reviews.map(r=><article key={r.name}><div className="review-top"><b>{r.name}</b><span>{'★'.repeat(r.rating)}{'☆'.repeat(5-r.rating)}</span></div><small>{r.segment}</small><p>“{r.text}”</p><em>Prototype review • illustrative</em></article>)}</div><div className="review-form"><div className="eyebrow">YOUR SIGNAL</div><h2>How did it work for you?</h2><div className="star-input">{[1,2,3,4,5].map(n=><button key={n} className={n<=rating?'on':''} onClick={()=>setRating(n)}><Star fill="currentColor"/></button>)}</div><div className="rating-bars"><span>Shine <b>★★★★★</b></span><span>Frizz control <b>★★★★☆</b></span><span>Moisture <b>{'★'.repeat(rating)}{'☆'.repeat(5-rating)}</b></span></div><h3>Would you use this routine again?</h3><div className="choices"><button className={repeat===true?'chosen':''} onClick={()=>setRepeat(true)}>Yes, I'd repeat it</button><button className={repeat===false?'chosen':''} onClick={()=>setRepeat(false)}>Not for me</button></div><textarea value={reviewText} onChange={e=>setReviewText(e.target.value)} placeholder="What did you notice?"></textarea><button className="primary" disabled={repeat===null} onClick={()=>go('learn')}>Submit & see what Nexxus learned <ArrowRight size={16}/></button></div></div></section>}
+function Profile({ quiz, segment, go }) {
+  return <section className="page profile-page"><div className="eyebrow"><Sparkles size={14} /> YOUR HAIR INTELLIGENCE</div><h1>We see a starting point.<br /><i>Now let’s make it smarter.</i></h1><div className="profile-grid"><div className="score-card"><span>PROFILE CONFIDENCE</span><strong>94%</strong><div className="ring"><b>94</b></div><p>Your profile evolves as Nexxus learns from your outcomes.</p></div><div className="facts">{[['SEGMENT', segment], ['YOUR GOAL', quiz.goal || 'Your goal'], ['ENVIRONMENT', `${quiz.city || 'Mumbai'} · 31°C · 78% humidity`], ['CONTEXT', quiz.context || 'Not yet added']].map(([a,b]) => <div key={a}><span>{a}</span><b>{b}</b><small>Used as a signal, never as a diagnosis.</small></div>)}</div></div><div className="actions"><button className="text-btn" onClick={() => go('quiz')}>Retake consultation</button><button className="primary" onClick={() => go('recommendation')}>See my recommendation <ArrowRight size={17} /></button></div></section>;
+}
 
-function Trends({active,setActive,go}){return <section className="trends-page"><div className="eyebrow">SENSE + UNDERSTAND</div><h1>What the world is doing.<br/><i>What matters to you.</i></h1><p className="lead">Nexxus treats social momentum as a signal — not an instruction. Trends are filtered through profile, context and outcomes before becoming recommendations.</p><div className="trend-explorer"><div className="trend-tabs">{trends.map(t=><button className={active.id===t.id?'active':''} onClick={()=>setActive(t)} key={t.id}><b>{t.name}</b><span>{t.delta}</span></button>)}</div><div className={`trend-feature ${active.tone}`}><div><div className="eyebrow">TREND SIGNAL · {active.delta}</div><h2>{active.name}</h2><p>{active.desc}</p><div className="signal-grid"><div><span>SOCIAL MOMENTUM</span><b>{active.delta}</b></div><div><span>YOUR MATCH</span><b>{active.match}</b></div><div><span>NEXXUS CONFIDENCE</span><b>82%</b></div></div></div><div className="trend-orb"><span>POPULARITY</span><strong>{active.delta}</strong><small>≠ relevance</small></div></div></div><div className="trend-cta"><div><span>THE NEXXUS RULE</span><h2>Trending doesn't mean right for everyone.</h2><p>We ask who should try it, under what conditions, and what happened when similar consumers did.</p></div><button className="primary" onClick={()=>go('quiz')}>Build my profile <ArrowRight size={16}/></button></div></section>}
+function Recommendation({ quiz, segment, go }) {
+  return <section className="page"><button className="back" onClick={() => go('profile')}><ChevronLeft size={16} /> Your profile</button><div className="recommend-head"><div><div className="eyebrow">PERSONALIZED RECOMMENDATION</div><h1>Built around<br /><i>your hair.</i></h1><p className="lead">Nexxus combines your profile, goal and environment — then explains why the recommendation makes sense.</p></div><div className="match-card"><span>PROFILE MATCH</span><strong>95%</strong><small>{quiz.goal || 'Personalized goal'}</small></div></div><div className="recommend-grid"><div className="adapt-card"><div className="adapt-label">NEXXUS ADAPT PRO</div><div className="cartridges"><i>BASE</i><i>HYDRATE</i><i>REPAIR</i><i>FINISH</i></div><div className="dispense">FRESHLY MIXED FOR YOU</div><h2>{quiz.goal || 'Your'} formula, today.</h2><p>Base + three adaptive cartridges. The device dispenses the exact proportions recommended for your current profile.</p><button className="primary" onClick={() => go('formula')}>See my formula <ArrowRight size={16} /></button></div><div className="why-card"><div className="eyebrow">WHY THIS FORMULA?</div>{[['01', segment], ['02', 'Environment-aware'], ['03', 'Goal-led']].map(([n,t]) => <div className="why-row" key={n}><b>{n}</b><span><strong>{t}</strong><small>Signals from your consultation are combined with contextual and learned signals.</small></span></div>)}<div className="science-note"><FlaskConical size={17} /><span><b>Science inside</b><small>Panthenol, argan oil and conditioning polymers are shown as ingredient references for the prototype formulation system.</small></span></div></div></div><div className="ingredients"><div className="eyebrow">INGREDIENT REFERENCE</div><h2>Explainable by design.</h2><div className="ingredient-list">{ingredients.map(([n,r,d]) => <div key={n}><span>{r}</span><b>{n}</b><small>{d}</small></div>)}</div></div></section>;
+}
 
-function How({go}){const items=[['01','DISCOVER','Sense emerging trends, consumer signals and environmental context.'],['02','UNDERSTAND','Combine those signals with hair profiles, routines, geography and outcomes.'],['03','PERSONALIZE','Identify what is relevant for this person, today.'],['04','FORMULATE','Translate the recommendation into a pre-validated formulation envelope.'],['05','LEARN','Capture trial, satisfaction, repeat and context — then improve the next recommendation.']];return <section className="how-page"><div className="eyebrow">HOW NEXXUS WORKS</div><h1>From signal<br/><i>to smarter haircare.</i></h1><div className="lifecycle">{items.map(([n,t,d])=><div key={n}><span>{n}</span><h2>{t}</h2><p>{d}</p></div>)}</div><div className="how-bottom"><div><b>Consumer loop</b><span>Trend → Trial → Satisfaction → Repeat → Sustained adoption</span></div><div><b>Brand loop</b><span>Sense → Understand → Validate → Launch → Operate → Learn</span></div></div><button className="primary" onClick={()=>go('quiz')}>Experience Nexxus <ArrowRight size={16}/></button></section>}
+function Formula({ quiz, formula, go }) {
+  const rows = [['base', 'BASE', formula.base, 'Foundation · nourishment + structure'], ['hydrate', 'HYDRATE', formula.hydrate, 'Moisture · hydration + protection'], ['repair', 'REPAIR', formula.repair, 'Strength · repair support'], ['finish', 'FINISH', formula.finish, 'Finish · shine + smoothness']];
+  return <section className="page"><button className="back" onClick={() => go('recommendation')}><ChevronLeft size={16} /> Recommendation</button><div className="formula-head"><div><div className="eyebrow">YOUR FORMULA TODAY</div><h1>Precisely mixed<br /><i>for you.</i></h1><p className="lead">For {quiz.goal || 'your goal'} in {quiz.city || 'your environment'}, the prototype adapts the four-part system.</p></div><div className="machine"><div className="machine-top">NEXXUS ADAPT PRO <small>SMART. PRECISE. PERSONALIZED.</small></div><div className="bottles"><i>BASE</i><i>HYDRATE</i><i>REPAIR</i><i>FINISH</i></div><div className="bowl">●</div><small>DISPENSING YOUR FORMULA</small></div></div><div className="mix-table">{rows.map(([c,n,v,d]) => <div key={n}><i className={`dot ${c}`} /><b>{n}</b><strong>{v}%</strong><span><em style={{ width: `${v}%` }} /></span><small>{d}</small></div>)}</div><div className="formula-note">✦ Exact proportions can change as Nexxus learns from your feedback.</div></section>;
+}
 
-function Learn({go}){return <section className="learn-page"><div className="eyebrow"><Brain size={14}/> LEARN + REPEAT</div><h1>Every outcome<br/><i>becomes a signal.</i></h1><div className="learn-grid"><div><span>YOUR SIGNAL</span><h3>Shine is a strong preference.</h3><p>Your feedback increases the weight given to high-shine outcomes in future recommendations.</p></div><div><span>CONTEXT SIGNAL</span><h3>Humidity changes the answer.</h3><p>For similar profiles, formulation performance can vary with geography, weather and season.</p></div><div><span>ECOSYSTEM SIGNAL</span><h3>Adoption creates evidence.</h3><p>Trend interest → trial → satisfaction → repeat becomes a learning loop for the wider ecosystem.</p></div></div><div className="learn-quote">“For consumers with this profile, this weather condition changes which formulation performs best.”</div><button className="primary" onClick={()=>go('home')}>Start another journey <RefreshCw size={16}/></button></section>}
+function Trends({ active, setActive, go }) {
+  return <section className="page trends-page"><div className="eyebrow">WHAT’S HAPPENING IN HAIRCARE</div><h1>Trending,<br /><i>reinterpreted.</i></h1><p className="lead">Nexxus reads social signals and consumer behaviour, then asks a better question: does this trend actually matter for your hair?</p><div className="trend-large">{trendData.map(t => <button className={active.id === t.id ? 'active' : ''} key={t.id} onClick={() => setActive(t)}><img src={t.image} alt="" /><span><b>{t.delta}</b> {t.tag}</span><h2>{t.title}</h2><small>{t.description}</small></button>)}</div><div className="trend-detail"><div><span>YOUR PROTOTYPE MATCH</span><strong>{active.match}</strong></div><div><span>WHAT NEXXUS LEARNED</span><p>{active.title} is treated as a signal, not a prescription. Your profile decides whether it earns a recommendation.</p></div><button className="primary" onClick={() => go('quiz')}>Check if it’s for me <ArrowRight size={16} /></button></div></section>;
+}
 
-export default App;
+function How({ go }) {
+  const steps = [['01', 'YOU', 'Profile, routine, goals and feedback'], ['02', 'CONDITIONS', 'Weather, season and environment'], ['03', 'TRENDS', 'Social signals and consumer behaviour'], ['04', 'NEXXUS INTELLIGENCE', 'Patterns become recommendation signals'], ['05', 'FORMULA', 'Better proportions and smarter routines'], ['06', 'LEARN', 'Results and reviews improve the next cycle']];
+  return <section className="page how-page"><div className="eyebrow">THE NEXXUS INTELLIGENCE LOOP</div><h1>Your hair. Our science.<br /><i>Smarter every day.</i></h1><p className="lead">The prototype connects personalization, trend intelligence, formulation and feedback into one continuous loop.</p><div className="loop-grid">{steps.map(([n,t,d]) => <div key={n}><span>{n}</span><strong>{t}</strong><p>{d}</p></div>)}</div><div className="loop-callout">✦ A continuous loop of learning — for hair that feels uniquely yours.</div><button className="primary" onClick={() => go('quiz')}>Start my profile <ArrowRight size={16} /></button></section>;
+}
+
+function Reviews({ rating, setRating, reviewText, setReviewText, go }) {
+  return <section className="page reviews-page"><div className="eyebrow">TRUST, BUILT IN</div><h1>Real signals.<br /><i>Human reviews.</i></h1><div className="review-summary"><div><strong>4.8</strong><span>★★★★★</span><small>Prototype review set</small></div><p>Reviews are organized by hair profile so people can see experiences that feel relevant to them.</p></div><div className="review-grid">{reviews.map(r => <article key={r.name}><div className="review-stars">{'★'.repeat(r.rating)}{'☆'.repeat(5-r.rating)}</div><p>“{r.text}”</p><b>{r.name}</b><small>{r.segment}</small></article>)}</div><div className="write-review"><div><div className="eyebrow">YOUR SIGNAL</div><h2>How was your experience?</h2><div className="rating-buttons">{[1,2,3,4,5].map(n => <button key={n} onClick={() => setRating(n)} className={n <= rating ? 'on' : ''}><Star fill="currentColor" size={20} /></button>)}</div></div><textarea value={reviewText} onChange={e => setReviewText(e.target.value)} placeholder="Tell us what worked, what didn’t, or what surprised you…" /><button className="primary" onClick={() => { setReviewText(''); alert('Thank you — your feedback is now part of the prototype learning loop.'); }}>Submit review <ArrowRight size={16} /></button></div><button className="text-btn" onClick={() => go('home')}>Back to NEXXUS <ArrowRight size={15} /></button></section>;
+}
