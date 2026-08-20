@@ -3,6 +3,6 @@ import './review-restore.css';
 import './logo.css';
 import './personalization.css';
 import './how.css';
-import RouteBridge from './RouteBridge';
+import GlobalActions from './GlobalActions';
 export const metadata={title:'Nexxus Intelligence',description:'Science that learns your hair.'};
-export default function RootLayout({children}){return <html lang="en"><body><RouteBridge/>{children}</body></html>}
+export default function RootLayout({children}){return <html lang="en"><body>{children}<GlobalActions/></body></html>}
