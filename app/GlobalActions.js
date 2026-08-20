@@ -30,7 +30,6 @@ export default function GlobalActions(){
 
   return <>
     {!view&&<div className="nx-global-actions" aria-label="Nexxus quick actions">
-      <button className="nx-my-button" onClick={()=>open('dashboard')}>My Nexxus</button>
       <button className="nx-buy-button" onClick={()=>open('buy')}>Buy My Routine <ArrowRight size={15}/></button>
     </div>}
 
